@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chatbot Panel</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 20px; }
+    .chat-box { margin-bottom: 20px; max-height: 400px; overflow-y: scroll; border: 1px solid #ccc; padding: 10px; }
+    .chat-message { margin: 10px 0; }
+    .user { color: blue; }
+    .bot { color: green; }
+    input[type="text"] { padding: 10px; width: 80%; }
+    button { padding: 10px; }
+  </style>
+</head>
+<body>
+
+  <h1>Chatbot Panel</h1>
+  <div class="chat-box" id="chat-box"></div>
+  <input type="text" id="user-message" placeholder="Ketik pesan..." />
+  <button onclick="sendMessage()">Kirim</button>
+
+  <script>
+    const chatBox = document.getElementById('chat-box');
+    const userMessageInput = document.getElementById('user-message');
+
+    const renderMessage = (role, content) => {
+      const messageDiv = document.createElement('div');
+      messageDiv.classList.add('chat-message');
+      messageDiv.classList.add(role);
+      messageDiv.textContent = `${role === 'user' ? 'User: ' : 'Bot: '}${content}`;
+      chatBox.appendChild(messageDiv);
+    };
+
+    const sendMessage = async () => {
+      const message = userMessageInput.value;
+      if (!message) return;
+
+      // Tampilkan pesan user
+      renderMessage('user', message);
+      userMessageInput.value = '';
+
+      // Kirim ke server
+      const response = await fetch('/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message })
+      });
+      const data = await response.json();
+
+      // Tampilkan respons bot
+      renderMessage('bot', data.response);
+    };
+  </script>
+
+</body>
+</html>
